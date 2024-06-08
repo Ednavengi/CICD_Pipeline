@@ -1,0 +1,19 @@
+version: 0.2
+
+phases:
+  pre_build:
+    commands:
+      - echo Logging in to Amazon ECR...
+      - aws ecr get-login-password --region ap-south-1 | docker login --username AWS --password-stdin public.ecr.aws/j8o1n7k5/docker_pipeline
+      - REPOSITORY_URI=public.ecr.aws/j8o1n7k5/docker_pipeline
+  build:
+    commands:
+      - echo Build started on `date`
+      - echo Building the Docker image...
+      - docker build -t docker-cicd-repo .
+      - docker tag docker-cicd-repo:latest $REPOSITORY_URI:latest
+  post_build:
+    commands:
+      - echo Build completed on `date`
+      - echo Pushing the Docker image...
+      - docker push $REPOSITORY_URI:latest
